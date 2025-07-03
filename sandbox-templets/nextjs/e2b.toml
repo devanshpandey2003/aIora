@@ -1,0 +1,17 @@
+# This is a config for E2B sandbox template.
+# You can use template ID (lknghijg2u6x7vqit1hp) or template name (alora-nextjs-test-3) to create a sandbox:
+
+# Python SDK
+# from e2b import Sandbox, AsyncSandbox
+# sandbox = Sandbox("alora-nextjs-test-3") # Sync sandbox
+# sandbox = await AsyncSandbox.create("alora-nextjs-test-3") # Async sandbox
+
+# JS SDK
+# import { Sandbox } from 'e2b'
+# const sandbox = await Sandbox.create('alora-nextjs-test-3')
+
+team_id = "125ce2a9-0e9e-44ca-9c3e-ba3e6abf062a"
+start_cmd = "/compile_page.sh"
+dockerfile = "e2b.Dockerfile"
+template_name = "alora-nextjs-test-3"
+template_id = "lknghijg2u6x7vqit1hp"
