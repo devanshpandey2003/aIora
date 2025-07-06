@@ -4,15 +4,22 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
-  
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 export default function Home() {
   const [value, setValue] = useState("");
 
   const trpc = useTRPC();
-  const invoke = useMutation(trpc.invoke.mutationOptions({}));
+  const invoke = useMutation(
+    trpc.invoke.mutationOptions({
+      onSuccess: () => {
+        toast("Background jobs invoked successfully!");
+      },
+    })
+  );
 
   return (
     <>
