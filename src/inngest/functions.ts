@@ -4,6 +4,7 @@ import {
   createTool,
   createNetwork,
   openai,
+  Tool,
 } from "@inngest/agent-kit";
 import { Sandbox } from "@e2b/code-interpreter";
 import { z } from "zod";
@@ -13,10 +14,16 @@ import { PROMPT } from "@/prompt";
 import { getSandbox, lastAssistantTextMessageContent } from "./utils";
 
 import { inngest } from "./client";
+import prisma from "@/lib/db";
 
-export const helloWorld = inngest.createFunction(
-  { id: "hello-world" },
-  { event: "test/hello.world" },
+interface AgentState {
+  summary?: string;
+  files?: { [path: string]: string };
+}
+
+export const codeAgentFunction = inngest.createFunction(
+  { id: "code-agent" },
+  { event: "code-agent/run" },
   async ({ event, step }) => {
     const sandboxId = await step.run("get-sandbox-id", async () => {
       try {
@@ -28,7 +35,7 @@ export const helloWorld = inngest.createFunction(
       }
     });
 
-    const codeAgent = createAgent({
+    const codeAgent = createAgent<AgentState>({
       name: "code-agent",
       description:
         "You are an expert coding agent that creates web applications",
@@ -87,7 +94,10 @@ export const helloWorld = inngest.createFunction(
               })
             ),
           }),
-          handler: async ({ files }, { step, network }) => {
+          handler: async (
+            { files },
+            { step, network }: Tool.Options<AgentState>
+          ) => {
             console.log(
               "createOrUpdateFiles tool called with files:",
               files.map((f) => f.path)
@@ -170,7 +180,6 @@ export const helloWorld = inngest.createFunction(
           );
 
           if (lastAssistantMessageText && network) {
-            // Ensure network state exists
             if (!network.state.data) {
               network.state.data = {};
             }
@@ -186,7 +195,7 @@ export const helloWorld = inngest.createFunction(
       },
     });
 
-    const network = createNetwork({
+    const network = createNetwork<AgentState>({
       name: "coding-agent-network",
       agents: [codeAgent],
       maxIter: 15,
@@ -212,16 +221,11 @@ export const helloWorld = inngest.createFunction(
       },
     });
 
-    console.log("Starting network execution with input:", event.data.value);
     const result = await network.run(event.data.value);
-    console.log("Network execution completed");
-    console.log("Final state:", {
-      hasFiles: !!result.state.data.files,
-      hasSummary: !!result.state.data.summary,
-      fileCount: result.state.data.files
-        ? Object.keys(result.state.data.files).length
-        : 0,
-    });
+
+    const isError =
+      !result.state.data.summary ||
+      Object.keys(result.state.data.files || {}).length === 0;
 
     const sandboxUrl = await step.run("get-sandbox-url", async () => {
       try {
@@ -232,6 +236,33 @@ export const helloWorld = inngest.createFunction(
         console.error(`Failed to get sandbox URL: ${e}`);
         return null;
       }
+    });
+
+    await step.run("save-result", async () => {
+      if (isError) {
+        return await prisma.message.create({
+          data: {
+            content:
+              "An error occurred during code execution. Please try again",
+            role: "ASSISTANT",
+            type: "ERROR",
+          },
+        });
+      }
+      return await prisma.message.create({
+        data: {
+          content: result.state.data.summary || "",
+          role: "ASSISTANT",
+          type: "RESULT",
+          fragments: {
+            create: {
+              sandboxUrl: sandboxUrl || "",
+              files: result.state.data.files || {},
+              title: "Fragmnts",
+            },
+          },
+        },
+      });
     });
 
     return {
