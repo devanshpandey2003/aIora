@@ -6,12 +6,15 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { MessageContainer } from "../components/message-container";
 
+import { Fragment } from "@/generated/prisma";
+
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import { ProjectHeader } from "../components/project-header";
 
 interface Props {
   projectId: string;
@@ -19,6 +22,8 @@ interface Props {
 
 export const ProjectView = ({ projectId }: Props) => {
   const trpc = useTRPC();
+
+  const [aciveFragment, setActiveFragment] = useState<Fragment | null>(null);
 
   const { data: project } = useSuspenseQuery(
     trpc.projects.getOne.queryOptions({
@@ -32,11 +37,41 @@ export const ProjectView = ({ projectId }: Props) => {
         <ResizablePanel
           defaultSize={35}
           minSize={20}
-          className="flex-1, flex-col, min-h-0"
+          className="flex flex-col min-h-0"
         >
-          <Suspense fallback={<p>Loading messages...</p>}>
-            <MessageContainer projectId={projectId} />
-          </Suspense>
+          <div className="flex-shrink-0">
+            <ProjectHeader
+              projectName={project.name}
+              projectId={projectId}
+              lastModified={project.updatedAt}
+              onShare={() => {
+                // TODO: Implement share functionality
+                console.log("Share project:", projectId);
+              }}
+              onDownload={() => {
+                // TODO: Implement download functionality
+                console.log("Download project:", projectId);
+              }}
+              onDelete={() => {
+                // TODO: Implement delete functionality
+                console.log("Delete project:", projectId);
+              }}
+              onToggleVisibility={() => {
+                // TODO: Implement visibility toggle
+                console.log("Toggle visibility for project:", projectId);
+              }}
+            />
+          </div>
+
+          <div className="flex-1 min-h-0">
+            <Suspense fallback={<p>Loading messages...</p>}>
+              <MessageContainer
+                activeFragment={aciveFragment}
+                setActiveFragment={setActiveFragment}
+                projectId={projectId}
+              />
+            </Suspense>
+          </div>
         </ResizablePanel>
 
         <ResizableHandle withHandle />
