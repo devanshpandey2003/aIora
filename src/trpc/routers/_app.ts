@@ -4,7 +4,7 @@ import { projectsRouter } from "@/modules/porjects/server/preocedures";
 import { messagesRouter } from "@/modules/messages/server/preocedures";
 
 export const appRouter = createTRPCRouter({
-  message: messagesRouter,
+  messages: messagesRouter,
   projects: projectsRouter,
 });
 
