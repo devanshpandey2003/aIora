@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/resizable";
 import { Suspense, useState } from "react";
 import { ProjectHeader } from "../components/project-header";
+import { FragmentWeb } from "../components/fragement_web";
 
 interface Props {
   projectId: string;
@@ -23,7 +24,7 @@ interface Props {
 export const ProjectView = ({ projectId }: Props) => {
   const trpc = useTRPC();
 
-  const [aciveFragment, setActiveFragment] = useState<Fragment | null>(null);
+  const [activeFragment, setActiveFragment] = useState<Fragment | null>(null);
 
   const { data: project } = useSuspenseQuery(
     trpc.projects.getOne.queryOptions({
@@ -66,7 +67,7 @@ export const ProjectView = ({ projectId }: Props) => {
           <div className="flex-1 min-h-0">
             <Suspense fallback={<p>Loading messages...</p>}>
               <MessageContainer
-                activeFragment={aciveFragment}
+                activeFragment={activeFragment}
                 setActiveFragment={setActiveFragment}
                 projectId={projectId}
               />
@@ -77,7 +78,7 @@ export const ProjectView = ({ projectId }: Props) => {
         <ResizableHandle withHandle />
 
         <ResizablePanel defaultSize={65} minSize={50}>
-          TODO: PREIEW
+          {!!activeFragment && <FragmentWeb data={activeFragment} />}
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
