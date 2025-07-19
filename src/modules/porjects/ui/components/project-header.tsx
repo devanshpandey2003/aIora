@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -51,6 +51,48 @@ export const ProjectHeader = ({
 }: ProjectHeaderProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(projectName);
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark" | "system">(
+    "system"
+  );
+
+  // Apply saved theme on component mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as
+      | "light"
+      | "dark"
+      | "system"
+      | null;
+    if (savedTheme) {
+      setCurrentTheme(savedTheme);
+      applyTheme(savedTheme);
+    } else {
+      // Default to system theme if no preference saved
+      applyTheme("system");
+    }
+  }, []);
+
+  const applyTheme = (theme: "light" | "dark" | "system") => {
+    const html = document.documentElement;
+
+    if (theme === "light") {
+      html.classList.remove("dark");
+    } else if (theme === "dark") {
+      html.classList.add("dark");
+    } else {
+      // system
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        html.classList.add("dark");
+      } else {
+        html.classList.remove("dark");
+      }
+    }
+  };
+
+  const handleThemeChange = (theme: "light" | "dark" | "system") => {
+    setCurrentTheme(theme);
+    localStorage.setItem("theme", theme);
+    applyTheme(theme);
+  };
 
   const handleNameSave = () => {
     setIsEditing(false);
@@ -151,41 +193,46 @@ export const ProjectHeader = ({
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
                     <DropdownMenuItem
-                      onClick={() => {
-                        document.documentElement.classList.remove("dark");
-                        localStorage.setItem("theme", "light");
-                      }}
-                      className="flex items-center gap-2"
+                      onClick={() => handleThemeChange("light")}
+                      className={`flex items-center gap-2 ${
+                        currentTheme === "light"
+                          ? "bg-gray-100 dark:bg-gray-800"
+                          : ""
+                      }`}
                     >
                       <SunIcon className="w-4 h-4" />
                       Light
+                      {currentTheme === "light" && (
+                        <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full"></div>
+                      )}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => {
-                        document.documentElement.classList.add("dark");
-                        localStorage.setItem("theme", "dark");
-                      }}
-                      className="flex items-center gap-2"
+                      onClick={() => handleThemeChange("dark")}
+                      className={`flex items-center gap-2 ${
+                        currentTheme === "dark"
+                          ? "bg-gray-100 dark:bg-gray-800"
+                          : ""
+                      }`}
                     >
                       <MoonIcon className="w-4 h-4" />
                       Dark
+                      {currentTheme === "dark" && (
+                        <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full"></div>
+                      )}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => {
-                        if (
-                          window.matchMedia("(prefers-color-scheme: dark)")
-                            .matches
-                        ) {
-                          document.documentElement.classList.add("dark");
-                        } else {
-                          document.documentElement.classList.remove("dark");
-                        }
-                        localStorage.setItem("theme", "system");
-                      }}
-                      className="flex items-center gap-2"
+                      onClick={() => handleThemeChange("system")}
+                      className={`flex items-center gap-2 ${
+                        currentTheme === "system"
+                          ? "bg-gray-100 dark:bg-gray-800"
+                          : ""
+                      }`}
                     >
                       <MonitorIcon className="w-4 h-4" />
                       System
+                      {currentTheme === "system" && (
+                        <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full"></div>
+                      )}
                     </DropdownMenuItem>
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
