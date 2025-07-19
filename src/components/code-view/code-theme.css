@@ -1,0 +1,402 @@
+/* VS Code Dark Theme for Code Syntax Highlighting */
+.code-view {
+  font-family: 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  border-radius: 8px;
+}
+
+.code-view.light {
+  background-color: #ffffff;
+  color: #24292f;
+}
+
+/* Line numbers */
+.code-line {
+  display: flex;
+  min-height: 21px;
+}
+
+.line-number {
+  user-select: none;
+  color: #858585;
+  padding-right: 16px;
+  padding-left: 16px;
+  text-align: right;
+  min-width: 40px;
+  font-variant-numeric: tabular-nums;
+  border-right: 1px solid #3c3c3c;
+}
+
+.light .line-number {
+  color: #6e7781;
+  border-right: 1px solid #e1e4e8;
+}
+
+.line-content {
+  padding-left: 16px;
+  padding-right: 16px;
+  flex: 1;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* Syntax highlighting - Dark theme */
+
+/* Custom scrollable code container - using absolute positioning */
+.scrollable-code-container {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  overflow: auto !important;
+  background: transparent !important;
+}
+
+/* Reset any conflicting styles */
+.scrollable-code-container * {
+  box-sizing: border-box !important;
+}
+
+/* Ensure proper scrolling for code blocks */
+.scrollable-code-container pre[class*="language-"] {
+  margin: 0 !important;
+  padding: 1rem !important;
+  overflow: visible !important;
+  white-space: pre !important;
+  background: transparent !important;
+  max-height: none !important;
+  height: auto !important;
+  position: static !important;
+  flex: none !important;
+}
+
+.scrollable-code-container code[class*="language-"] {
+  background: transparent !important;
+  white-space: pre !important;
+  display: block !important;
+  overflow: visible !important;
+  height: auto !important;
+  position: static !important;
+  flex: none !important;
+}
+
+.token.comment {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.token.keyword {
+  color: #569cd6;
+}
+
+.token.string {
+  color: #ce9178;
+}
+
+.token.number {
+  color: #b5cea8;
+}
+
+.token.function {
+  color: #dcdcaa;
+}
+
+.token.variable {
+  color: #9cdcfe;
+}
+
+.token.operator {
+  color: #d4d4d4;
+}
+
+.token.punctuation {
+  color: #d4d4d4;
+}
+
+.token.tag {
+  color: #569cd6;
+}
+
+.token.attr-name {
+  color: #9cdcfe;
+}
+
+.token.attr-value {
+  color: #ce9178;
+}
+
+.token.class-name {
+  color: #4ec9b0;
+}
+
+.token.builtin {
+  color: #4ec9b0;
+}
+
+.token.boolean {
+  color: #569cd6;
+}
+
+.token.null {
+  color: #569cd6;
+}
+
+.token.undefined {
+  color: #569cd6;
+}
+
+.token.property {
+  color: #9cdcfe;
+}
+
+.token.method {
+  color: #dcdcaa;
+}
+
+.token.constant {
+  color: #4fc1ff;
+}
+
+.token.regex {
+  color: #d16969;
+}
+
+.token.important {
+  color: #f44747;
+}
+
+/* Light theme syntax highlighting */
+.light .token.comment {
+  color: #6a737d;
+}
+
+.light .token.keyword {
+  color: #d73a49;
+}
+
+.light .token.string {
+  color: #032f62;
+}
+
+.light .token.number {
+  color: #005cc5;
+}
+
+.light .token.function {
+  color: #6f42c1;
+}
+
+.light .token.variable {
+  color: #24292f;
+}
+
+.light .token.operator {
+  color: #24292f;
+}
+
+.light .token.punctuation {
+  color: #24292f;
+}
+
+.light .token.tag {
+  color: #22863a;
+}
+
+.light .token.attr-name {
+  color: #005cc5;
+}
+
+.light .token.attr-value {
+  color: #032f62;
+}
+
+.light .token.class-name {
+  color: #6f42c1;
+}
+
+.light .token.builtin {
+  color: #005cc5;
+}
+
+.light .token.boolean {
+  color: #005cc5;
+}
+
+.light .token.null {
+  color: #005cc5;
+}
+
+.light .token.undefined {
+  color: #005cc5;
+}
+
+.light .token.property {
+  color: #24292f;
+}
+
+.light .token.method {
+  color: #6f42c1;
+}
+
+.light .token.constant {
+  color: #005cc5;
+}
+
+.light .token.regex {
+  color: #032f62;
+}
+
+.light .token.important {
+  color: #d73a49;
+}
+
+/* Scrollbar styling */
+.code-view::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.code-view::-webkit-scrollbar-track {
+  background: #2d2d30;
+}
+
+.code-view::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 6px;
+}
+
+.code-view::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.light.code-view::-webkit-scrollbar-track {
+  background: #f6f8fa;
+}
+
+.light.code-view::-webkit-scrollbar-thumb {
+  background: #d1d9e0;
+}
+
+.light.code-view::-webkit-scrollbar-thumb:hover {
+  background: #c8d3dc;
+}
+
+/* Selection */
+.code-view ::selection {
+  background: #264f78;
+}
+
+.light.code-view ::selection {
+  background: #add6ff;
+}
+
+/* Active line highlighting */
+.line-highlight {
+  background-color: #2a2d2e;
+}
+
+.light .line-highlight {
+  background-color: #f6f8fa;
+}
+
+/* File tabs */
+.code-tabs {
+  display: flex;
+  background: #2d2d30;
+  border-bottom: 1px solid #3c3c3c;
+  overflow-x: auto;
+}
+
+.light .code-tabs {
+  background: #f6f8fa;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+.code-tab {
+  padding: 8px 16px;
+  background: #2d2d30;
+  color: #cccccc;
+  border-right: 1px solid #3c3c3c;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.code-tab:hover {
+  background: #37373d;
+}
+
+.code-tab.active {
+  background: #1e1e1e;
+  color: #ffffff;
+}
+
+.light .code-tab {
+  background: #f6f8fa;
+  color: #586069;
+  border-right: 1px solid #e1e4e8;
+}
+
+.light .code-tab:hover {
+  background: #ffffff;
+}
+
+.light .code-tab.active {
+  background: #ffffff;
+  color: #24292f;
+}
+
+/* File type indicators */
+.file-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  display: inline-block;
+}
+
+.file-icon.tsx::before,
+.file-icon.ts::before {
+  content: "TS";
+  background: #3178c6;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.file-icon.jsx::before,
+.file-icon.js::before {
+  content: "JS";
+  background: #f7df1e;
+  color: black;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.file-icon.css::before {
+  content: "CSS";
+  background: #1572b6;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.file-icon.html::before {
+  content: "HTML";
+  background: #e34f26;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
