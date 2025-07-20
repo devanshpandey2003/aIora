@@ -35,7 +35,7 @@ export const codeAgentFunction = inngest.createFunction(
       }
     });
 
-    const codeAgent = createAgent<AgentState>({
+    const gptcodeAgent = createAgent<AgentState>({
       name: "code-agent",
       description:
         "You are an expert coding agent that creates web applications",
@@ -197,7 +197,7 @@ export const codeAgentFunction = inngest.createFunction(
 
     const network = createNetwork<AgentState>({
       name: "coding-agent-network",
-      agents: [codeAgent],
+      agents: [gptcodeAgent],
       maxIter: 15,
       router: async ({ network }) => {
         console.log("Router called");
@@ -217,7 +217,7 @@ export const codeAgentFunction = inngest.createFunction(
         }
 
         console.log("Continuing with code agent");
-        return codeAgent;
+        return gptcodeAgent;
       },
     });
 

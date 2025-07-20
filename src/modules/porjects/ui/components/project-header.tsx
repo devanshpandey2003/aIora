@@ -8,9 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import {
   ChevronDownIcon,
@@ -18,15 +15,12 @@ import {
   ShareIcon,
   DownloadIcon,
   TrashIcon,
-  MoreHorizontalIcon,
-  FolderIcon,
   GlobeIcon,
   LockIcon,
   SunIcon,
   MoonIcon,
   MonitorIcon,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 interface ProjectHeaderProps {
   projectName: string;
@@ -51,6 +45,7 @@ export const ProjectHeader = ({
 }: ProjectHeaderProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(projectName);
+  const [showThemeOptions, setShowThemeOptions] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark" | "system">(
     "system"
   );
@@ -62,13 +57,10 @@ export const ProjectHeader = ({
       | "dark"
       | "system"
       | null;
-    if (savedTheme) {
-      setCurrentTheme(savedTheme);
-      applyTheme(savedTheme);
-    } else {
-      // Default to system theme if no preference saved
-      applyTheme("system");
-    }
+
+    const initialTheme = savedTheme || "system";
+    setCurrentTheme(initialTheme);
+    applyTheme(initialTheme);
   }, []);
 
   const applyTheme = (theme: "light" | "dark" | "system") => {
@@ -80,7 +72,10 @@ export const ProjectHeader = ({
       html.classList.add("dark");
     } else {
       // system
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      if (prefersDark) {
         html.classList.add("dark");
       } else {
         html.classList.remove("dark");
@@ -89,9 +84,36 @@ export const ProjectHeader = ({
   };
 
   const handleThemeChange = (theme: "light" | "dark" | "system") => {
+    console.log("🎨 Theme changing from", currentTheme, "to", theme);
+
     setCurrentTheme(theme);
     localStorage.setItem("theme", theme);
-    applyTheme(theme);
+    setShowThemeOptions(false); // Close theme options
+
+    // Apply theme immediately
+    const html = document.documentElement;
+
+    if (theme === "light") {
+      html.classList.remove("dark");
+      console.log("☀️ Applied light theme, dark class removed");
+    } else if (theme === "dark") {
+      html.classList.add("dark");
+      console.log("🌙 Applied dark theme, dark class added");
+    } else {
+      // system
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      if (prefersDark) {
+        html.classList.add("dark");
+        console.log("🖥️ Applied system theme (dark), dark class added");
+      } else {
+        html.classList.remove("dark");
+        console.log("🖥️ Applied system theme (light), dark class removed");
+      }
+    }
+
+    console.log("📱 Current HTML classes:", html.className);
   };
 
   const handleNameSave = () => {
@@ -112,20 +134,23 @@ export const ProjectHeader = ({
   };
 
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-      <div className="px-4 py-2">
+    <div className="border-b border-border/60 bg-card/80 backdrop-blur-sm shadow-sm">
+      <div className="px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Left side - Logo and Project name dropdown */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {/* Logo */}
-            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-sm">
-              <Image
-                src="/logo.svg"
-                alt="Alora"
-                width={16}
-                height={16}
-                className="shrink-0"
-              />
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-chart-2/30 rounded-xl blur-sm"></div>
+              <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary/90 to-chart-2 shadow-lg">
+                <Image
+                  src="/logo.svg"
+                  alt="Vibe"
+                  width={20}
+                  height={20}
+                  className="shrink-0 filter brightness-0 invert"
+                />
+              </div>
             </div>
 
             {/* Project name dropdown */}
@@ -133,19 +158,22 @@ export const ProjectHeader = ({
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-0 h-auto"
+                  className="text-xl font-bold text-foreground hover:text-primary transition-colors p-0 h-auto group"
                 >
                   {projectName}
-                  <ChevronDownIcon className="w-4 h-4 ml-2" />
+                  <ChevronDownIcon className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56">
-                <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
-                  <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+              <DropdownMenuContent
+                align="start"
+                className="w-64 bg-card/95 backdrop-blur-sm border-border/60"
+              >
+                <div className="px-4 py-3 border-b border-border/50">
+                  <div className="font-semibold text-base text-foreground">
                     {projectName}
                   </div>
                   {lastModified && (
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-muted-foreground mt-1">
                       Modified {formatLastModified(lastModified)}
                     </div>
                   )}
@@ -153,102 +181,139 @@ export const ProjectHeader = ({
 
                 <DropdownMenuItem
                   onClick={onShare}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors"
                 >
-                  <ShareIcon className="w-4 h-4" />
+                  <div className="p-1 rounded-md bg-primary/10">
+                    <ShareIcon className="w-4 h-4 text-primary" />
+                  </div>
                   Share Project
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
                   onClick={onDownload}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors"
                 >
-                  <DownloadIcon className="w-4 h-4" />
+                  <div className="p-1 rounded-md bg-chart-2/10">
+                    <DownloadIcon className="w-4 h-4 text-chart-2" />
+                  </div>
                   Download Project
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
                   onClick={onToggleVisibility}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors"
                 >
                   {isPublic ? (
                     <>
-                      <LockIcon className="w-4 h-4" />
+                      <div className="p-1 rounded-md bg-destructive/10">
+                        <LockIcon className="w-4 h-4 text-destructive" />
+                      </div>
                       Make Private
                     </>
                   ) : (
                     <>
-                      <GlobeIcon className="w-4 h-4" />
+                      <div className="p-1 rounded-md bg-chart-3/10">
+                        <GlobeIcon className="w-4 h-4 text-chart-3" />
+                      </div>
                       Make Public
                     </>
                   )}
                 </DropdownMenuItem>
 
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-border/30" />
 
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="flex items-center gap-2">
-                    <SunIcon className="w-4 h-4" />
+                {!showThemeOptions ? (
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setShowThemeOptions(true);
+                    }}
+                    className="flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="p-1 rounded-md bg-chart-4/10">
+                      <SunIcon className="w-4 h-4 text-chart-4" />
+                    </div>
                     Appearance
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
+                    <ChevronDownIcon className="w-4 h-4 ml-auto" />
+                  </DropdownMenuItem>
+                ) : (
+                  <>
                     <DropdownMenuItem
-                      onClick={() => handleThemeChange("light")}
-                      className={`flex items-center gap-2 ${
-                        currentTheme === "light"
-                          ? "bg-gray-100 dark:bg-gray-800"
-                          : ""
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setShowThemeOptions(false);
+                      }}
+                      className="flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="m15 18-6-6 6-6" />
+                      </svg>
+                      Back
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => handleThemeChange("light")}
+                      className={`flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors ${
+                        currentTheme === "light" ? "bg-accent/70" : ""
                       }`}
                     >
                       <SunIcon className="w-4 h-4" />
                       Light
                       {currentTheme === "light" && (
-                        <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full"></div>
+                        <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
                       )}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => handleThemeChange("dark")}
-                      className={`flex items-center gap-2 ${
-                        currentTheme === "dark"
-                          ? "bg-gray-100 dark:bg-gray-800"
-                          : ""
+                      onSelect={() => handleThemeChange("dark")}
+                      className={`flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors ${
+                        currentTheme === "dark" ? "bg-accent/70" : ""
                       }`}
                     >
                       <MoonIcon className="w-4 h-4" />
                       Dark
                       {currentTheme === "dark" && (
-                        <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full"></div>
+                        <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
                       )}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => handleThemeChange("system")}
-                      className={`flex items-center gap-2 ${
-                        currentTheme === "system"
-                          ? "bg-gray-100 dark:bg-gray-800"
-                          : ""
+                      onSelect={() => handleThemeChange("system")}
+                      className={`flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors ${
+                        currentTheme === "system" ? "bg-accent/70" : ""
                       }`}
                     >
                       <MonitorIcon className="w-4 h-4" />
                       System
                       {currentTheme === "system" && (
-                        <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full"></div>
+                        <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
                       )}
                     </DropdownMenuItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                  </>
+                )}
 
-                <DropdownMenuItem className="flex items-center gap-2">
-                  <SettingsIcon className="w-4 h-4" />
+                <DropdownMenuItem className="flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors">
+                  <div className="p-1 rounded-md bg-muted">
+                    <SettingsIcon className="w-4 h-4 text-muted-foreground" />
+                  </div>
                   Project Settings
                 </DropdownMenuItem>
 
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-border/30" />
 
                 <DropdownMenuItem
                   onClick={onDelete}
-                  className="flex items-center gap-2 text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+                  className="flex items-center gap-3 py-3 text-destructive hover:bg-destructive/10 focus:text-destructive transition-colors"
                 >
-                  <TrashIcon className="w-4 h-4" />
+                  <div className="p-1 rounded-md bg-destructive/10">
+                    <TrashIcon className="w-4 h-4" />
+                  </div>
                   Delete Project
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -256,25 +321,26 @@ export const ProjectHeader = ({
           </div>
 
           {/* Right side - Back button */}
-          <Link href="/projects">
+          <Link href="/">
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-card/60 border-border/60 hover:bg-accent/80 hover:border-accent-foreground/20 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
             >
               <svg
-                width="14"
-                height="14"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                className="transition-transform group-hover:-translate-x-1"
               >
                 <path d="m15 18-6-6 6-6" />
               </svg>
-              Back
+              Back to Home
             </Button>
           </Link>
         </div>
