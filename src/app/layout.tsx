@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TRPCReactProvider } from "@/trpc/client";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ThemeProvider } from "@/components/theme-provider";
 
 import { Toaster } from "sonner";
 
@@ -29,21 +30,28 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <TRPCReactProvider>
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
-            {children}
-            <Toaster
-              position="top-right"
-              richColors
-              closeButton
-              toastOptions={{
-                style: {
-                  fontFamily: "var(--font-geist-sans)",
-                },
-              }}
-            />
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster
+                position="top-right"
+                richColors
+                closeButton
+                toastOptions={{
+                  style: {
+                    fontFamily: "var(--font-geist-sans)",
+                  },
+                }}
+              />
+            </ThemeProvider>
           </body>
         </html>
       </TRPCReactProvider>

@@ -18,6 +18,7 @@ datasource db {
 model project {
   id        String   @id @default(cuid())
   name      String
+  userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

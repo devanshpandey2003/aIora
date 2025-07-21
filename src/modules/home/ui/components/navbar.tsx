@@ -2,107 +2,33 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { useUser, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { useState } from "react";
+import { useUser, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import {
-  SunIcon,
-  MoonIcon,
-  MonitorIcon,
-  ChevronDownIcon,
-  MenuIcon,
-} from "lucide-react";
+import { MenuIcon } from "lucide-react";
+import { UserControl } from "@/components/user-control";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { toast } from "sonner";
 
 export const Navbar = () => {
   const { isSignedIn, user } = useUser();
-  const [showThemeOptions, setShowThemeOptions] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState<"light" | "dark" | "system">(
-    "system"
-  );
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Apply saved theme on component mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as
-      | "light"
-      | "dark"
-      | "system"
-      | null;
-
-    const initialTheme = savedTheme || "system";
-    setCurrentTheme(initialTheme);
-    applyTheme(initialTheme);
-  }, []);
-
-  const applyTheme = (theme: "light" | "dark" | "system") => {
-    const html = document.documentElement;
-
-    if (theme === "light") {
-      html.classList.remove("dark");
-    } else if (theme === "dark") {
-      html.classList.add("dark");
-    } else {
-      // system
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      if (prefersDark) {
-        html.classList.add("dark");
-      } else {
-        html.classList.remove("dark");
-      }
+  const scrollToProjects = () => {
+    const projectsSection = document.querySelector("#projects-section");
+    if (projectsSection) {
+      projectsSection.scrollIntoView({ behavior: "smooth" });
     }
+    setIsMobileMenuOpen(false);
   };
 
-  const handleThemeChange = (theme: "light" | "dark" | "system") => {
-    console.log("🎨 Theme changing from", currentTheme, "to", theme);
-
-    setCurrentTheme(theme);
-    localStorage.setItem("theme", theme);
-    setShowThemeOptions(false);
-
-    // Apply theme immediately
-    const html = document.documentElement;
-
-    if (theme === "light") {
-      html.classList.remove("dark");
-      console.log("☀️ Applied light theme, dark class removed");
-    } else if (theme === "dark") {
-      html.classList.add("dark");
-      console.log("🌙 Applied dark theme, dark class added");
-    } else {
-      // system
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      if (prefersDark) {
-        html.classList.add("dark");
-        console.log("🖥️ Applied system theme (dark), dark class added");
-      } else {
-        html.classList.remove("dark");
-        console.log("🖥️ Applied system theme (light), dark class removed");
-      }
-    }
-
-    console.log("📱 Current HTML classes:", html.className);
-  };
-
-  const getThemeIcon = () => {
-    switch (currentTheme) {
-      case "light":
-        return <SunIcon className="w-4 h-4" />;
-      case "dark":
-        return <MoonIcon className="w-4 h-4" />;
-      default:
-        return <MonitorIcon className="w-4 h-4" />;
-    }
+  const handleAboutClick = () => {
+    toast.info("🚧 Coming Soon!", {
+      description:
+        "The About page is currently under development. Stay tuned for updates!",
+      duration: 3000,
+    });
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -139,83 +65,25 @@ export const Navbar = () => {
               >
                 Home
               </Link>
-              <Link
-                href="/projects"
+              <button
+                onClick={scrollToProjects}
                 className="text-muted-foreground hover:text-foreground transition-colors font-medium"
               >
                 Projects
-              </Link>
-              <Link
-                href="/about"
+              </button>
+              <button
+                onClick={handleAboutClick}
                 className="text-muted-foreground hover:text-foreground transition-colors font-medium"
               >
                 About
-              </Link>
+              </button>
             </div>
           </div>
 
           {/* Right side - Theme switcher and auth */}
           <div className="flex items-center gap-4 flex-shrink-0 ml-auto">
             {/* Theme switcher */}
-            <DropdownMenu
-              open={showThemeOptions}
-              onOpenChange={setShowThemeOptions}
-            >
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {getThemeIcon()}
-                  <span className="hidden sm:inline capitalize">
-                    {currentTheme}
-                  </span>
-                  <ChevronDownIcon className="w-3 h-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="bg-card/95 backdrop-blur-sm border-border/60"
-              >
-                <DropdownMenuItem
-                  onSelect={() => handleThemeChange("light")}
-                  className={`flex items-center gap-3 py-2 ${
-                    currentTheme === "light" ? "bg-accent/70" : ""
-                  }`}
-                >
-                  <SunIcon className="w-4 h-4" />
-                  Light
-                  {currentTheme === "light" && (
-                    <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => handleThemeChange("dark")}
-                  className={`flex items-center gap-3 py-2 ${
-                    currentTheme === "dark" ? "bg-accent/70" : ""
-                  }`}
-                >
-                  <MoonIcon className="w-4 h-4" />
-                  Dark
-                  {currentTheme === "dark" && (
-                    <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => handleThemeChange("system")}
-                  className={`flex items-center gap-3 py-2 ${
-                    currentTheme === "system" ? "bg-accent/70" : ""
-                  }`}
-                >
-                  <MonitorIcon className="w-4 h-4" />
-                  System
-                  {currentTheme === "system" && (
-                    <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
-                  )}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ThemeToggle />
 
             {/* Authentication buttons */}
             {isSignedIn ? (
@@ -223,18 +91,11 @@ export const Navbar = () => {
                 <span className="hidden sm:inline text-sm text-muted-foreground">
                   Welcome, {user?.firstName || "User"}
                 </span>
-                <UserButton
-                  appearance={{
-                    elements: {
-                      avatarBox:
-                        "w-8 h-8 rounded-full border-2 border-border hover:border-primary transition-colors",
-                    },
-                  }}
-                />
+                <UserControl />
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <SignInButton mode="modal">
+                <SignInButton>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -243,7 +104,7 @@ export const Navbar = () => {
                     Sign In
                   </Button>
                 </SignInButton>
-                <SignUpButton mode="modal">
+                <SignUpButton>
                   <Button
                     size="sm"
                     className="bg-gradient-to-r from-primary to-chart-2 hover:from-primary/90 hover:to-chart-2/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
@@ -277,20 +138,18 @@ export const Navbar = () => {
               >
                 Home
               </Link>
-              <Link
-                href="/projects"
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
+              <button
+                onClick={scrollToProjects}
+                className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 text-left"
               >
                 Projects
-              </Link>
-              <Link
-                href="/about"
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
+              </button>
+              <button
+                onClick={handleAboutClick}
+                className="text-muted-foreground hover:text-foreground transition-colors font-medium py-2 text-left"
               >
                 About
-              </Link>
+              </button>
             </div>
           </div>
         )}
