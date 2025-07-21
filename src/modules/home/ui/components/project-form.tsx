@@ -14,6 +14,7 @@ import { useTRPC } from "@/trpc/client";
 import { Form, FormField } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
 import { PROJECT_TEMPLATES } from "../../constant";
+import { useClerk } from "@clerk/nextjs";
 
 const messageFormSchema = z.object({
   value: z
@@ -26,6 +27,7 @@ export const ProjectFrom = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const trpc = useTRPC();
+  const clerk = useClerk();
 
   const form = useForm<z.infer<typeof messageFormSchema>>({
     resolver: zodResolver(messageFormSchema),
@@ -44,8 +46,12 @@ export const ProjectFrom = () => {
       },
 
       onError: (error) => {
-        console.error("Error sending message:", error);
-        toast.error("Failed to send message. Please try again.");
+        toast.error(error.message);
+
+        if (error.data?.code === "UNAUTHORIZED") {
+          router.push("/sign-in");
+          return;
+        }
       },
     })
   );
@@ -82,9 +88,9 @@ export const ProjectFrom = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 ">
+    <div className="w-full max-w-4xl mx-auto px-2 ">
       {/* Tier Selection */}
-      <div className="mb-6 flex justify-center">
+      <div className="mb-3 flex justify-center">
         <div className="inline-flex bg-muted/50 p-1 rounded-2xl border border-border/50 backdrop-blur-sm">
           <button
             type="button"
@@ -98,9 +104,6 @@ export const ProjectFrom = () => {
           >
             <ZapIcon className="size-4" />
             Free
-            <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
-              Gemini
-            </span>
           </button>
           <button
             type="button"
@@ -114,9 +117,6 @@ export const ProjectFrom = () => {
           >
             <SparklesIcon className="size-4" />
             Premium
-            <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full">
-              GPT-4
-            </span>
           </button>
         </div>
       </div>
