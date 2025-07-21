@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TextareaAutosize from "react-textarea-autosize";
-import { ArrowUpIcon, Loader2Icon } from "lucide-react";
+import { ArrowUpIcon, Loader2Icon, SparklesIcon, ZapIcon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
@@ -51,6 +51,7 @@ export const ProjectFrom = () => {
   );
 
   const [isFocused, setIsFocused] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<"free" | "premium">("free");
   const isPending = createProject.isPending;
   const watchedValue = form.watch("value");
   const isDisabled =
@@ -65,6 +66,7 @@ export const ProjectFrom = () => {
     try {
       await createProject.mutateAsync({
         value: values.value.trim(),
+        tier: selectedTier,
       });
     } catch (error) {
       console.error("Submit error:", error);
@@ -80,7 +82,66 @@ export const ProjectFrom = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-3">
+    <div className="w-full max-w-4xl mx-auto px-4 ">
+      {/* Tier Selection */}
+      <div className="mb-6 flex justify-center">
+        <div className="inline-flex bg-muted/50 p-1 rounded-2xl border border-border/50 backdrop-blur-sm">
+          <button
+            type="button"
+            onClick={() => setSelectedTier("free")}
+            className={cn(
+              "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300",
+              selectedTier === "free"
+                ? "bg-background shadow-lg text-foreground border border-border/50"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <ZapIcon className="size-4" />
+            Free
+            <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
+              Gemini
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedTier("premium")}
+            className={cn(
+              "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300",
+              selectedTier === "premium"
+                ? "bg-background shadow-lg text-foreground border border-border/50"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <SparklesIcon className="size-4" />
+            Premium
+            <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full">
+              GPT-4
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Tier Information */}
+      <div className="mb-6 text-center">
+        <div className="text-sm text-muted-foreground">
+          {selectedTier === "free" ? (
+            <div className="flex items-center justify-center gap-2">
+              <span>🚀 Quick updates to HTML, CSS, JS files</span>
+              <span className="text-xs bg-muted px-2 py-1 rounded-full">
+                Perfect for simple projects
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <span>⚡ Full Next.js apps with advanced features</span>
+              <span className="text-xs bg-muted px-2 py-1 rounded-full">
+                Production-ready applications
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
       <Form {...form}>
         <section className="spcae-y-6">
           <form
@@ -154,7 +215,7 @@ export const ProjectFrom = () => {
               </div>
             </div>
           </form>
-          <div className="hidden md:flex flex-wrap justify-center gap-3 max-w-4xl mx-auto mt-6 items-center">
+          <div className="hidden md:flex flex-wrap justify-center gap-2 max-w-3xl mx-auto mt-6 items-center">
             {PROJECT_TEMPLATES.map((template) => (
               <Button
                 key={template.title}
