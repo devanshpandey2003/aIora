@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useEffect } from "react";
 import { useUser, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { MenuIcon } from "lucide-react";
@@ -13,6 +14,12 @@ import { toast } from "sonner";
 export const Navbar = () => {
   const { isSignedIn, user } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  // Ensure mobile menu only renders after mount to avoid hydration errors
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const scrollToProjects = () => {
     const projectsSection = document.querySelector("#projects-section");
@@ -32,7 +39,7 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border/60 bg-card/80 backdrop-blur-sm shadow-sm">
+    <nav className="sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center h-16">
           {/* Left side - Logo and brand */}
@@ -57,7 +64,7 @@ export const Navbar = () => {
           </div>
 
           {/* Center - Navigation links (hidden on mobile) - Absolutely centered */}
-          <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2">
+          {/* <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2">
             <div className="flex items-center space-x-8">
               <Link
                 href="/"
@@ -78,7 +85,7 @@ export const Navbar = () => {
                 About
               </button>
             </div>
-          </div>
+          </div> */}
 
           {/* Right side - Theme switcher and auth */}
           <div className="flex items-center gap-4 flex-shrink-0 ml-auto">
@@ -89,7 +96,7 @@ export const Navbar = () => {
             {isSignedIn ? (
               <div className="flex items-center gap-3">
                 <span className="hidden sm:inline text-sm text-muted-foreground">
-                  Welcome, {user?.firstName || "User"}
+                  {user?.firstName || "User"}
                 </span>
                 <UserControl />
               </div>
@@ -127,9 +134,9 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-border/30 py-4">
+        {/* Mobile menu - only render after mount to avoid hydration errors */}
+        {mounted && isMobileMenuOpen && (
+          <div className="md:hidden py-4 bg-transparent">
             <div className="flex flex-col space-y-3">
               <Link
                 href="/"
