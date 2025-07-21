@@ -44,6 +44,7 @@ export const projectsRouter = createTRPCRouter({
           .string()
           .min(1, { message: "Prompt cannot be empty" })
           .max(10000, { message: "Prompt is too long" }),
+        tier: z.enum(["free", "premium"]).default("free"),
       })
     )
     .mutation(async ({ input }) => {
@@ -62,8 +63,12 @@ export const projectsRouter = createTRPCRouter({
         },
       });
 
+      // Determine which event to send based on tier
+      const eventName =
+        input.tier === "free" ? "free-tier-code-agent/run" : "code-agent/run";
+
       await inngest.send({
-        name: "code-agent/run",
+        name: eventName,
         data: {
           value: input.value,
           projectId: createdProject.id,
