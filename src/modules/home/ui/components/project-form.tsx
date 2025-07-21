@@ -15,6 +15,7 @@ import { Form, FormField } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
 import { PROJECT_TEMPLATES } from "../../constant";
 import { useClerk } from "@clerk/nextjs";
+import { useTier } from "@/hooks/use-context"; // Import the tier context
 
 const messageFormSchema = z.object({
   value: z
@@ -28,6 +29,7 @@ export const ProjectFrom = () => {
   const queryClient = useQueryClient();
   const trpc = useTRPC();
   const clerk = useClerk();
+  const { tier, setTier } = useTier(); // Get tier state and setter from context
 
   const form = useForm<z.infer<typeof messageFormSchema>>({
     resolver: zodResolver(messageFormSchema),
@@ -57,7 +59,7 @@ export const ProjectFrom = () => {
   );
 
   const [isFocused, setIsFocused] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<"free" | "premium">("free");
+  // Remove local selectedTier state since we're using context
   const isPending = createProject.isPending;
   const watchedValue = form.watch("value");
   const isDisabled =
@@ -72,7 +74,7 @@ export const ProjectFrom = () => {
     try {
       await createProject.mutateAsync({
         value: values.value.trim(),
-        tier: selectedTier,
+        tier: tier, // Use tier from context
       });
     } catch (error) {
       console.error("Submit error:", error);
@@ -89,15 +91,15 @@ export const ProjectFrom = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-2 ">
-      {/* Tier Selection */}
+      {/* Tier Selection - now uses context */}
       <div className="mb-3 flex justify-center">
         <div className="inline-flex bg-muted/50 p-1 rounded-2xl border border-border/50 backdrop-blur-sm">
           <button
             type="button"
-            onClick={() => setSelectedTier("free")}
+            onClick={() => setTier("free")}
             className={cn(
               "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300",
-              selectedTier === "free"
+              tier === "free"
                 ? "bg-background shadow-lg text-foreground border border-border/50"
                 : "text-muted-foreground hover:text-foreground"
             )}
@@ -107,10 +109,10 @@ export const ProjectFrom = () => {
           </button>
           <button
             type="button"
-            onClick={() => setSelectedTier("premium")}
+            onClick={() => setTier("premium")}
             className={cn(
               "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300",
-              selectedTier === "premium"
+              tier === "premium"
                 ? "bg-background shadow-lg text-foreground border border-border/50"
                 : "text-muted-foreground hover:text-foreground"
             )}
@@ -124,16 +126,21 @@ export const ProjectFrom = () => {
       {/* Tier Information */}
       <div className="mb-6 text-center">
         <div className="text-sm text-muted-foreground">
-          {selectedTier === "free" ? (
+          {tier === "free" ? (
             <div className="flex items-center justify-center gap-2">
-              <span>🚀 Quick updates to HTML, CSS, JS files</span>
+              <span>
+                🚀 Unlimited request with Quick updates to HTML, CSS, JS files
+              </span>
               <span className="text-xs bg-muted px-2 py-1 rounded-full">
                 Perfect for simple projects
               </span>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-2">
-              <span>⚡ Full Next.js apps with advanced features</span>
+              <span>
+                ⚡ Limited request for Next.js apps with advanced features, pro
+                version available.
+              </span>
               <span className="text-xs bg-muted px-2 py-1 rounded-full">
                 Production-ready applications
               </span>

@@ -6,12 +6,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TextareaAutosize from "react-textarea-autosize";
 import { ArrowUpIcon, Loader2Icon } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
 import { Form, FormField } from "@/components/ui/form";
+import { Usage } from "./usage";
+import { useTier } from "@/hooks/use-context";
 
 interface Props {
   projectId: string;
@@ -27,6 +29,9 @@ const messageFormSchema = z.object({
 export const MessageForm = ({ projectId }: Props) => {
   const queryClient = useQueryClient();
   const trpc = useTRPC();
+
+  const { tier } = useTier();
+  const { data: usage } = useQuery(trpc.usage.status.queryOptions());
 
   const form = useForm<z.infer<typeof messageFormSchema>>({
     resolver: zodResolver(messageFormSchema),
@@ -48,13 +53,13 @@ export const MessageForm = ({ projectId }: Props) => {
 
       onError: (error) => {
         console.error("Error sending message:", error);
-        toast.error("Failed to send message. Please try again.");
+        toast.error(error.message || "Failed to send message");
       },
     })
   );
 
   const [isFocused, setIsFocused] = useState(false);
-  const showUsage = false;
+  const showUsage = true;
   const isPending = createMessage.isPending;
   const watchedValue = form.watch("value");
   const isDisabled =
@@ -79,6 +84,20 @@ export const MessageForm = ({ projectId }: Props) => {
   return (
     <div className="w-full px-4 py-3">
       <Form {...form}>
+        {tier === "free" ? (
+          <div className="mb-2 text-xs text-blue-500">
+            You are using the free tier.
+          </div>
+        ) : (
+          showUsage &&
+          usage && (
+            <Usage
+              point={usage.remainingPoints}
+              msBeforeNext={usage.msBeforeNext}
+            />
+          )
+        )}
+
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className={cn(
