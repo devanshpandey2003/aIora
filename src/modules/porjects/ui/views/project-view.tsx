@@ -25,6 +25,7 @@ import Link from "next/link";
 import FileExplorer from "@/components/file-explorer";
 import { UserControl } from "@/components/user-control";
 import { useAuth } from "@clerk/nextjs";
+import { ErrorBoundary } from "react-error-boundary";
 
 interface Props {
   projectId: string;
@@ -55,37 +56,43 @@ export const ProjectView = ({ projectId }: Props) => {
           className="flex flex-col min-h-0"
         >
           <div className="flex-shrink-0">
-            <ProjectHeader
-              projectName={project.name}
-              projectId={projectId}
-              lastModified={project.updatedAt}
-              onShare={() => {
-                // TODO: Implement share functionality
-                console.log("Share project:", projectId);
-              }}
-              onDownload={() => {
-                // TODO: Implement download functionality
-                console.log("Download project:", projectId);
-              }}
-              onDelete={() => {
-                // TODO: Implement delete functionality
-                console.log("Delete project:", projectId);
-              }}
-              onToggleVisibility={() => {
-                // TODO: Implement visibility toggle
-                console.log("Toggle visibility for project:", projectId);
-              }}
-            />
+            <ErrorBoundary fallback={<p>Error loading project header!</p>}>
+              <Suspense fallback={<p>Loading project...</p>}>
+                <ProjectHeader
+                  projectName={project.name}
+                  projectId={projectId}
+                  lastModified={project.updatedAt}
+                  onShare={() => {
+                    // TODO: Implement share functionality
+                    console.log("Share project:", projectId);
+                  }}
+                  onDownload={() => {
+                    // TODO: Implement download functionality
+                    console.log("Download project:", projectId);
+                  }}
+                  onDelete={() => {
+                    // TODO: Implement delete functionality
+                    console.log("Delete project:", projectId);
+                  }}
+                  onToggleVisibility={() => {
+                    // TODO: Implement visibility toggle
+                    console.log("Toggle visibility for project:", projectId);
+                  }}
+                />
+              </Suspense>
+            </ErrorBoundary>
           </div>
 
           <div className="flex-1 min-h-0">
-            <Suspense fallback={<p>Loading messages...</p>}>
-              <MessageContainer
-                activeFragment={activeFragment}
-                setActiveFragment={setActiveFragment}
-                projectId={projectId}
-              />
-            </Suspense>
+            <ErrorBoundary fallback={<p>Error loading messages!</p>}>
+              <Suspense fallback={<p>Loading messages...</p>}>
+                <MessageContainer
+                  activeFragment={activeFragment}
+                  setActiveFragment={setActiveFragment}
+                  projectId={projectId}
+                />
+              </Suspense>
+            </ErrorBoundary>
           </div>
         </ResizablePanel>
 
