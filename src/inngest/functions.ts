@@ -1,5 +1,4 @@
 import {
-  Agent,
   createAgent,
   createTool,
   createNetwork,
@@ -9,6 +8,7 @@ import {
   type Message,
   createState,
 } from "@inngest/agent-kit";
+import type { Inngest } from "inngest";
 import { Sandbox } from "@e2b/code-interpreter";
 import { z } from "zod";
 
@@ -186,7 +186,10 @@ server.listen(8000, () => {
           console.log("Custom Node.js server started on port 8000");
           return "Custom Node.js web server started";
         } catch (nodeError) {
-          console.log("Custom Node.js failed, trying Python approach");
+          console.log(
+            "Custom Node.js failed, trying Python approach",
+            nodeError
+          );
           // Fallback to Python if Node.js fails
           try {
             await sandbox.commands.run(
@@ -196,7 +199,10 @@ server.listen(8000, () => {
             console.log("Python HTTP server started on port 8000");
             return "Python web server started";
           } catch (pythonError) {
-            console.log("Both approaches failed, will retry later");
+            console.log(
+              "Both approaches failed, will retry later",
+              pythonError
+            );
             return "Failed to start initial server, will retry";
           }
         }
@@ -329,7 +335,7 @@ Please analyze these files and apply the requested changes: ${event.data.value}`
                   );
                   await new Promise((resolve) => setTimeout(resolve, 1000));
                 } catch (killError) {
-                  console.log("No existing servers to kill");
+                  console.log("No existing servers to kill", killError);
                 }
 
                 // Create a simple Node.js server script if it doesn't exist
@@ -543,7 +549,6 @@ export const codeAgentFunction = inngest.createFunction(
     const sandboxId = await step.run("get-sandbox-id", async () => {
       try {
         const sandbox = await Sandbox.create("alora-nextjs-test-3");
-        await sandbox.setTimeout(60_000 * 10 * 1);
         return sandbox.sandboxId;
       } catch (e) {
         console.error(`Failed to create sandbox: ${e}`);
@@ -561,7 +566,6 @@ export const codeAgentFunction = inngest.createFunction(
         orderBy: {
           createdAt: "asc",
         },
-        take: 4,
       });
 
       for (const message of messages) {
@@ -572,7 +576,7 @@ export const codeAgentFunction = inngest.createFunction(
         });
       }
 
-      return formattedMessage.reverse();
+      return formattedMessage;
     });
 
     const state = createState<AgentState>(
@@ -778,7 +782,7 @@ export const codeAgentFunction = inngest.createFunction(
       description: "A Fragment title generator",
       system: FRAGMENT_TITLE_PROMPT,
       model: openai({
-        model: "gemini-1.5-flash",
+        model: "gpt-4o",
       }),
     });
 
@@ -787,7 +791,7 @@ export const codeAgentFunction = inngest.createFunction(
       description: "A response generator",
       system: RESPONSE_PROMPT,
       model: openai({
-        model: "gemini-1.5-flash",
+        model: "gpt-4o",
       }),
     });
 
@@ -880,10 +884,9 @@ export const getCodeAgentFunction = (tier: "free" | "premium") => {
   return tier === "free" ? freeTierCodeAgentFunction : codeAgentFunction;
 };
 
-// You can also create a unified function that handles both tiers
 export const runCodeAgent = async (
-  inngestClient: any,
-  data: any,
+  inngestClient: Inngest,
+  data: Record<string, string>,
   tier: "free" | "premium"
 ) => {
   const eventName =

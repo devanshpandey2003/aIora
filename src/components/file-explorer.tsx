@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useMemo } from "react";
 import {
   FileIcon,
@@ -63,7 +65,6 @@ export const FileExplorer = ({
   filesContent = {},
   onFileSelect,
   onFolderToggle,
-  selectedFile,
   className = "",
 }: Props) => {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(

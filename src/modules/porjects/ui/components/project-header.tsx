@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -12,11 +14,8 @@ import {
 import {
   ChevronDownIcon,
   SettingsIcon,
-  ShareIcon,
   DownloadIcon,
   TrashIcon,
-  GlobeIcon,
-  LockIcon,
   SunIcon,
   MoonIcon,
   MonitorIcon,
@@ -25,9 +24,8 @@ import {
 interface ProjectHeaderProps {
   projectName: string;
   projectId: string;
-  isPublic?: boolean;
   lastModified?: Date;
-  onShare?: () => void;
+
   onDownload?: () => void;
   onDelete?: () => void;
   onToggleVisibility?: () => void;
@@ -35,16 +33,10 @@ interface ProjectHeaderProps {
 
 export const ProjectHeader = ({
   projectName,
-  projectId,
-  isPublic = false,
   lastModified,
-  onShare,
   onDownload,
   onDelete,
-  onToggleVisibility,
 }: ProjectHeaderProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(projectName);
   const [showThemeOptions, setShowThemeOptions] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark" | "system">(
     "system"
@@ -116,11 +108,6 @@ export const ProjectHeader = ({
     console.log("📱 Current HTML classes:", html.className);
   };
 
-  const handleNameSave = () => {
-    setIsEditing(false);
-    // TODO: Add API call to save the name
-  };
-
   const formatLastModified = (date: Date) => {
     const now = new Date();
     const diffInMinutes = Math.floor(
@@ -180,16 +167,6 @@ export const ProjectHeader = ({
                 </div>
 
                 <DropdownMenuItem
-                  onClick={onShare}
-                  className="flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors"
-                >
-                  <div className="p-1 rounded-md bg-primary/10">
-                    <ShareIcon className="w-4 h-4 text-primary" />
-                  </div>
-                  Share Project
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
                   onClick={onDownload}
                   className="flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors"
                 >
@@ -197,27 +174,6 @@ export const ProjectHeader = ({
                     <DownloadIcon className="w-4 h-4 text-chart-2" />
                   </div>
                   Download Project
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  onClick={onToggleVisibility}
-                  className="flex items-center gap-3 py-3 hover:bg-accent/50 transition-colors"
-                >
-                  {isPublic ? (
-                    <>
-                      <div className="p-1 rounded-md bg-destructive/10">
-                        <LockIcon className="w-4 h-4 text-destructive" />
-                      </div>
-                      Make Private
-                    </>
-                  ) : (
-                    <>
-                      <div className="p-1 rounded-md bg-chart-3/10">
-                        <GlobeIcon className="w-4 h-4 text-chart-3" />
-                      </div>
-                      Make Public
-                    </>
-                  )}
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator className="bg-border/30" />

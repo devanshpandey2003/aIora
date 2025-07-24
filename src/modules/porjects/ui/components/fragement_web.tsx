@@ -1,10 +1,11 @@
+"use client";
+
 import { useState } from "react";
 import {
   ExternalLinkIcon,
   RefreshCwIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
-  HomeIcon,
   MoreHorizontalIcon,
 } from "lucide-react";
 
@@ -21,12 +22,12 @@ export const FragmentWeb = ({ data }: Props) => {
 
   const handleRefresh = () => {
     setIsLoading(true);
-    const iframe = document.getElementById(
-      "fragment-iframe"
-    ) as HTMLIFrameElement;
-    if (iframe) {
-      iframe.src = iframe.src;
-    }
+    // Force reload by changing the url state (add a dummy query param)
+    setUrl((prev) => {
+      const u = new URL(prev || data.sandboxUrl);
+      u.searchParams.set("_r", Date.now().toString());
+      return u.toString();
+    });
     setTimeout(() => setIsLoading(false), 1000);
   };
 
@@ -115,7 +116,7 @@ export const FragmentWeb = ({ data }: Props) => {
         <iframe
           id="fragment-iframe"
           className="w-full h-full border-0"
-          src={data.sandboxUrl}
+          src={url}
           sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
           loading="lazy"
           onLoad={() => setIsLoading(false)}

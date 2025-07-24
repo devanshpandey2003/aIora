@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 import { animate } from "animejs";
 
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Fragment, MessageRole, MessageType } from "@/generated/prisma";
 import { ChevronRightIcon, Code2Icon } from "lucide-react";

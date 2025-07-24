@@ -14,7 +14,6 @@ import { useTRPC } from "@/trpc/client";
 import { Form, FormField } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
 import { PROJECT_TEMPLATES } from "../../constant";
-import { useClerk } from "@clerk/nextjs";
 import { useTier } from "@/hooks/use-context"; // Import the tier context
 
 const messageFormSchema = z.object({
@@ -28,7 +27,6 @@ export const ProjectFrom = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const trpc = useTRPC();
-  const clerk = useClerk();
   const { tier, setTier } = useTier(); // Get tier state and setter from context
 
   const form = useForm<z.infer<typeof messageFormSchema>>({

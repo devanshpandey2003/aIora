@@ -1,6 +1,7 @@
 "use client";
-
 import { useTRPC } from "@/trpc/client";
+
+import JSZip from "jszip";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -18,7 +19,6 @@ import {
 import { Suspense, useState } from "react";
 import { ProjectHeader } from "../components/project-header";
 import { FragmentWeb } from "../components/fragement_web";
-import { CodeView } from "@/components/code-view";
 import { CodeIcon, CrownIcon, EyeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -47,6 +47,28 @@ export const ProjectView = ({ projectId }: Props) => {
     })
   );
 
+  const handleDownloadProject = async () => {
+    if (!activeFragment?.files) {
+      alert("No files to download!");
+      return;
+    }
+    const zip = new JSZip();
+    Object.entries(activeFragment.files as { [path: string]: string }).forEach(
+      ([path, content]) => {
+        zip.file(path, content);
+      }
+    );
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${project?.name || "project"}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="h-screen">
       <ResizablePanelGroup direction="horizontal">
@@ -62,22 +84,9 @@ export const ProjectView = ({ projectId }: Props) => {
                   projectName={project.name}
                   projectId={projectId}
                   lastModified={project.updatedAt}
-                  onShare={() => {
-                    // TODO: Implement share functionality
-                    console.log("Share project:", projectId);
-                  }}
-                  onDownload={() => {
-                    // TODO: Implement download functionality
-                    console.log("Download project:", projectId);
-                  }}
-                  onDelete={() => {
-                    // TODO: Implement delete functionality
-                    console.log("Delete project:", projectId);
-                  }}
-                  onToggleVisibility={() => {
-                    // TODO: Implement visibility toggle
-                    console.log("Toggle visibility for project:", projectId);
-                  }}
+                  onDownload={handleDownloadProject}
+                  onDelete={() => {}}
+                  onToggleVisibility={() => {}}
                 />
               </Suspense>
             </ErrorBoundary>
@@ -118,6 +127,25 @@ export const ProjectView = ({ projectId }: Props) => {
               </TabsList>
 
               <div className="ml-auto flex items-center gap-x-2">
+                <div title="Deployment functionality coming soon!">
+                  <Button size="sm" variant="default" disabled>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 3v12m0 0l-4-4m4 4l4-4m-4 4v6"
+                      />
+                    </svg>
+                    Publish
+                  </Button>
+                </div>
                 {!hasProAccess && (
                   <Button asChild size="sm" variant="default">
                     <Link href="/pricing">

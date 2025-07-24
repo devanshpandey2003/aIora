@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from "react";
 import Prism from "prismjs";
 import {
@@ -9,8 +11,6 @@ import {
   CodeIcon,
   ImageIcon,
   SettingsIcon,
-  DatabaseIcon,
-  FileImageIcon,
   XIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,6 @@ export const CodeView = ({
   className = "",
   theme = "dark",
   showLineNumbers = true,
-  maxHeight = "100vh",
 }: Props) => {
   const [currentFile, setCurrentFile] = useState(
     activeFile || files[0]?.name || ""
