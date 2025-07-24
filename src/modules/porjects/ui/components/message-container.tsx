@@ -93,9 +93,14 @@ export const MessageContainer = ({
   const [isGenerating, setIsGenerating] = useState(false);
 
   const { data: messages } = useSuspenseQuery(
-    trpc.messages.getMany.queryOptions({
-      projectId: projectId,
-    })
+    trpc.messages.getMany.queryOptions(
+      {
+        projectId: projectId,
+      },
+      {
+        refetchInterval: 2000,
+      }
+    )
   );
 
   // Track when a user message is sent but no assistant response yet
