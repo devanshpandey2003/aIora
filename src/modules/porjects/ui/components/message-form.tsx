@@ -14,6 +14,7 @@ import { useTRPC } from "@/trpc/client";
 import { Form, FormField } from "@/components/ui/form";
 import { Usage } from "./usage";
 import { useTier } from "@/hooks/use-context";
+import { useRouter } from "next/navigation";
 
 interface Props {
   projectId: string;
@@ -29,6 +30,7 @@ const messageFormSchema = z.object({
 export const MessageForm = ({ projectId }: Props) => {
   const queryClient = useQueryClient();
   const trpc = useTRPC();
+  const router = useRouter();
 
   const { tier } = useTier();
   const { data: usage } = useQuery(trpc.usage.status.queryOptions());
@@ -49,11 +51,15 @@ export const MessageForm = ({ projectId }: Props) => {
           trpc.messages.getMany.queryOptions({ projectId })
         );
         toast.success("Message sent successfully!");
+        queryClient.invalidateQueries(trpc.usage.status.queryOptions());
       },
 
       onError: (error) => {
         console.error("Error sending message:", error);
         toast.error(error.message || "Failed to send message");
+        if (error.data?.code === "TOO_MANY_REQUESTS") {
+          router.push("/pricing");
+        }
       },
     })
   );
@@ -74,6 +80,7 @@ export const MessageForm = ({ projectId }: Props) => {
     try {
       await createMessage.mutateAsync({
         projectId,
+        tier,
         value: values.value.trim(),
       });
     } catch (error) {

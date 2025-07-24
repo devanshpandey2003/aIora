@@ -43,6 +43,9 @@ export const ProjectFrom = () => {
     trpc.projects.create.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries(trpc.projects.getMany.queryOptions());
+
+        queryClient.invalidateQueries(trpc.usage.status.queryOptions());
+
         router.push(`/projects/${data.id}`);
         toast.success("Project created successfully!");
       },
@@ -52,13 +55,31 @@ export const ProjectFrom = () => {
 
         if (error.data?.code === "UNAUTHORIZED") {
           router.push("/sign-in");
-          return;
+        }
+        if (error.data?.code === "TOO_MANY_REQUESTS") {
+          toast.error("You have reached your usage limit for this tier.");
+          router.push("/pricing");
         }
       },
     })
   );
 
   const [isFocused, setIsFocused] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltipPosition({
+      x: rect.left + rect.width / 2,
+      y: rect.bottom + 8,
+    });
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
   // Remove local selectedTier state since we're using context
   const isPending = createProject.isPending;
   const watchedValue = form.watch("value");
@@ -74,7 +95,7 @@ export const ProjectFrom = () => {
     try {
       await createProject.mutateAsync({
         value: values.value.trim(),
-        tier: tier, // Use tier from context
+        tier, // Use tier from context
       });
     } catch (error) {
       console.error("Submit error:", error);
@@ -92,21 +113,25 @@ export const ProjectFrom = () => {
   return (
     <div className="w-full max-w-4xl mx-auto px-2 ">
       {/* Tier Selection - now uses context */}
-      <div className="mb-3 flex justify-center">
+      <div className="mb-3 flex justify-center relative">
         <div className="inline-flex bg-muted/50 p-1 rounded-2xl border border-border/50 backdrop-blur-sm">
-          <button
-            type="button"
-            onClick={() => setTier("free")}
-            className={cn(
-              "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300",
-              tier === "free"
-                ? "bg-background shadow-lg text-foreground border border-border/50"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <ZapIcon className="size-4" />
-            Free
-          </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setTier("free")}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              className={cn(
+                "flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300",
+                tier === "free"
+                  ? "bg-background shadow-lg text-foreground border border-border/50"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <ZapIcon className="size-4" />
+              Free
+            </button>
+          </div>
           <button
             type="button"
             onClick={() => setTier("premium")}
@@ -238,6 +263,50 @@ export const ProjectFrom = () => {
           </div>
         </section>
       </Form>
+
+      {/* Portal-style tooltip that renders above everything */}
+      {showTooltip && (
+        <div
+          className="fixed w-[320px] z-[9999] pointer-events-none transition-all duration-300"
+          style={{
+            left: `${tooltipPosition.x}px`,
+            top: `${tooltipPosition.y}px`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          {/* Glow effect background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 via-orange-400/20 to-red-400/20 rounded-xl blur-xl animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-300/10 via-orange-300/10 to-red-300/10 rounded-xl blur-lg"></div>
+
+          {/* Main tooltip content */}
+          <div className="relative bg-gradient-to-r from-amber-50 via-orange-50 to-red-50 dark:from-amber-950/90 dark:via-orange-950/90 dark:to-red-950/90 border-2 border-gradient-to-r border-amber-200/50 dark:border-amber-700/50 rounded-xl shadow-2xl px-4 py-3 backdrop-blur-sm">
+            {/* Warning icon with glow */}
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-amber-400 rounded-full blur-sm opacity-75 animate-pulse"></div>
+                  <div className="relative w-5 h-5 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg">
+                    ⚠
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="text-xs font-medium text-amber-800 dark:text-amber-200 mb-1">
+                  Beta Feature Warning
+                </div>
+                <div className="text-xs text-amber-700/80 dark:text-amber-300/80 leading-relaxed">
+                  This functionality might not always generate highly accurate
+                  or expected results. The developer is trying his butt hard to
+                  meet your expectations and fine‑tune the LLM.
+                </div>
+              </div>
+            </div>
+
+            {/* Animated border glow */}
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/30 via-orange-400/30 to-red-400/30 opacity-75 transition-opacity duration-500 -z-10 blur-sm"></div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

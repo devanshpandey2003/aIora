@@ -3,15 +3,19 @@ import { RateLimiterPrisma } from "rate-limiter-flexible";
 import prisma from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 
-const FREE_POINTS = 2; // Set this to the desired number of free points
+const FREE_POINTS = 1; // Set this to the desired number of free points
+const PRO_POINTS = 100;
 const DURATION = 30 * 24 * 60 * 60; //30days
 const GENERATION_COST = 1;
 
 export async function getUsageTracker() {
+  const { has } = await auth();
+  const hasProAccess = has({ plan: "pro" });
+
   const usageTracker = new RateLimiterPrisma({
     storeClient: prisma,
     tableName: "Usage",
-    points: FREE_POINTS,
+    points: hasProAccess ? PRO_POINTS : FREE_POINTS,
     duration: DURATION,
   });
   return usageTracker;

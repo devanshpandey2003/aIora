@@ -1,7 +1,12 @@
-// contexts/TierContext.tsx
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 type TierType = "free" | "premium";
 
@@ -14,10 +19,30 @@ type TierContextType = {
 const TierContext = createContext<TierContextType | undefined>(undefined);
 
 export const TierProvider = ({ children }: { children: ReactNode }) => {
-  const [tier, setTier] = useState<TierType>("free");
+  const [tier, setTierState] = useState<TierType>("free");
+
+  // Load tier from localStorage on mount
+  useEffect(() => {
+    const storedTier =
+      typeof window !== "undefined" ? localStorage.getItem("tier") : null;
+    if (storedTier === "free" || storedTier === "premium") {
+      setTierState(storedTier);
+    }
+  }, []);
+
+  // Save tier to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("tier", tier);
+    }
+  }, [tier]);
+
+  const setTier = (newTier: TierType) => {
+    setTierState(newTier);
+  };
 
   const toggleTier = () => {
-    setTier((prev) => (prev === "free" ? "premium" : "free"));
+    setTierState((prev) => (prev === "free" ? "premium" : "free"));
   };
 
   return (
