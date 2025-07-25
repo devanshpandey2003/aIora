@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Website Builder is a meta tool – a website that builds websites.
+You can generate HTML/CSS/JS or Next.js projects, download the complete code, and even deploy in one click.
 
-## Getting Started
+⚡ No setup.
+⚡ No config.
+⚡ Just Build → Download → Deploy.
 
-First, run the development server:
+✨ Features
+✅ Instant website creation – Static (HTML/CSS/JS) or Next.js
+✅ Download the full project + source code
+✅ One-click deploy – push your site live in seconds
+✅ 3 tiers – Free, Free (with limits), and Subscription plans
+✅ Usage-friendly UI – minimal, fast, and easy to use
 
-```bash
+🏗️ How It Works
+Choose a template or start from scratch
+
+Build → instantly generate a site
+
+Download the code (zip) or deploy in one click
+
+Explore your new live site 🚀
+
+🛠️ Tech Stack
+Frontend: Next.js + TailwindCSS
+
+Code Generation: Dynamic templating for HTML, CSS, JS & Next.js
+
+Deployment: One-click integration with hosting platforms
+
+Backend: Node.js / Express
+
+Storage & Limits: Free tier & subscription model
+
+🔥 Tiers
+🆓 Free Tier: Build basic HTML/CSS/JS sites
+
+🆓 Next.js Tier (Limited): Create Next.js projects with usage limits
+
+💎 Pro Subscription: Unlock unlimited builds, advanced templates & extra features
+
+🚀 Quick Start
+bash
+Copy
+Edit
+# Clone the repo
+git clone https://github.com/your-username/website-builder.git
+
+# Enter the project directory
+cd website-builder
+
+# Install dependencies
+npm install
+
+# Run the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Then visit http://localhost:3000 🎉
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+📦 Download & Deploy
+✅ Download full source code for your generated site
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+✅ Deploy in one click (integrated hosting)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+💡 Feedback & Contributions
+I’d love your feedback! Found a bug? Got a crazy idea? Want to improve the builder?
 
-## Learn More
+Open an issue
 
-To learn more about Next.js, take a look at the following resources:
+Submit a pull request
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Or just reach out with your suggestions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🌐 Live Demo: [https://alora-lake.vercel.app]
+👉 Try it here
 
-## Deploy on Vercel
+📜 License
+This project is MIT Licensed – feel free to explore, modify & contribute.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+⭐ If you like this project, give it a star on GitHub!
+Build. Download. Deploy. In Minutes.
