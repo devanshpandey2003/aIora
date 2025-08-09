@@ -3,7 +3,6 @@ import {
   createTool,
   createNetwork,
   openai,
-  gemini,
   type Tool,
   type Message,
   createState,
@@ -218,8 +217,8 @@ server.listen(8000, () => {
         "You are a web development assistant that updates existing HTML, CSS, and JavaScript files based on user requests",
       system: FREE_TIER_PROMPT,
 
-      model: gemini({
-        model: "gemini-1.5-flash",
+      model: openai({
+        model: "gpt-4o",
       }),
 
       tools: [
@@ -596,7 +595,7 @@ export const codeAgentFunction = inngest.createFunction(
 
       model: openai({
         model: "gpt-4.1",
-        defaultParameters: { temperature: 0.1 },
+        defaultParameters: { temperature: 1 },
       }),
 
       tools: [
@@ -782,7 +781,7 @@ export const codeAgentFunction = inngest.createFunction(
       description: "A Fragment title generator",
       system: FRAGMENT_TITLE_PROMPT,
       model: openai({
-        model: "gpt-4o",
+        model: "gpt-4",
       }),
     });
 
@@ -791,7 +790,7 @@ export const codeAgentFunction = inngest.createFunction(
       description: "A response generator",
       system: RESPONSE_PROMPT,
       model: openai({
-        model: "gpt-4o",
+        model: "gpt-4",
       }),
     });
 
